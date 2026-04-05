@@ -62,7 +62,7 @@ function createSB(url,key){
         then:(res,rej)=>{return dbReq('GET',table,['select='+cols,ord].filter(Boolean),null).then(res,rej);}
       };return q;
     },
-    delete:()=>({eq:(c,v)=>dbReq('DELETE',table,[c+'=eq.'+encodeURIComponent(v)],null)}),
+    delete:()=>({eq:async(c,v)=>{const q='?'+c+'=eq.'+encodeURIComponent(v);const r=await fetch(url+'/rest/v1/'+table+q,{method:'DELETE',headers:hdrs()});return r.ok?{data:null,error:null}:{data:null,error:'Delete failed'};}})  ,
   });
   return{auth,from};
 }
@@ -311,7 +311,7 @@ function App(){
                       <td style={{padding:'9px 12px',color:T.textSec,fontSize:11,whiteSpace:'nowrap'}}>{p.paid_date||'—'}</td>
                       <td style={{padding:'9px 12px'}}><span style={{background:'#f5f3ef',color:T.textSec,fontSize:9,padding:'1px 6px',borderRadius:10,border:'1px solid '+T.border}}>{p.year||'—'}</span></td>
                       <td style={{padding:'9px 12px',color:'#2a7a50',fontWeight:700,textAlign:'right',fontSize:13,whiteSpace:'nowrap'}}>{cur(p.amount)}</td>
-                      <td style={{padding:'9px 12px'}}><button onClick={()=>{if(window.confirm('Remove?'))delPay(p.id);}} style={{background:T.redPale,border:'1px solid rgba(192,57,43,0.25)',borderRadius:5,color:T.red,fontSize:11,padding:'3px 8px',cursor:'pointer'}}>✕</button></td>
+                      <td style={{padding:'9px 12px'}}><button onClick={()=>{if(window.confirm('Are you sure you want to remove this record? This cannot be undone.'))delPay(p.id);}} style={{background:T.redPale,border:'1px solid rgba(192,57,43,0.25)',borderRadius:5,color:T.red,fontSize:11,padding:'3px 8px',cursor:'pointer'}}>✕</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -357,7 +357,7 @@ function App(){
                       <td style={{padding:'9px 12px',color:T.textSec,textAlign:'right',fontSize:12}}>{p.agent_split_pct?p.agent_split_pct+'%':'—'}</td>
                       <td style={{padding:'9px 12px',color:T.amber,fontWeight:700,textAlign:'right',fontSize:13,whiteSpace:'nowrap'}}>{cur(p.expected_amount)}</td>
                       <td style={{padding:'9px 12px'}}><span style={{display:'inline-block',padding:'2px 8px',borderRadius:20,fontSize:10,fontWeight:700,whiteSpace:'nowrap',background:p.status==='received'?T.greenLight:T.amberLight,color:p.status==='received'?T.green:T.amber,border:'1px solid '+(p.status==='received'?'rgba(42,122,80,.25)':'rgba(181,115,10,.25)')}}>{p.status==='received'?'Received':'Pending'}</span></td>
-                      <td style={{padding:'9px 12px'}}><button onClick={()=>{if(window.confirm('Remove?'))delPend(p.id);}} style={{background:T.redPale,border:'1px solid rgba(192,57,43,0.25)',borderRadius:5,color:T.red,fontSize:11,padding:'3px 8px',cursor:'pointer'}}>✕</button></td>
+                      <td style={{padding:'9px 12px'}}><button onClick={()=>{if(window.confirm('Are you sure you want to remove this record? This cannot be undone.'))delPend(p.id);}} style={{background:T.redPale,border:'1px solid rgba(192,57,43,0.25)',borderRadius:5,color:T.red,fontSize:11,padding:'3px 8px',cursor:'pointer'}}>✕</button></td>
                     </tr>
                   ))}
                 </tbody>
